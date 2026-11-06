@@ -21,13 +21,15 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Compile APK
+      - name: Unzip and Compile APK
         run: |
-          PROJECT_DIR="."
-          if [ -d "android" ] && [ -f "android/build.gradle.kts" ]; then
-            PROJECT_DIR="android"
+          # Unzip the project keeping all original folders intact
+          if [ -f "SpendIQ-AndroidStudio-Project.zip" ]; then
+            unzip -o SpendIQ-AndroidStudio-Project.zip
+            cd spendiq-android
           fi
-          cd "$PROJECT_DIR"
+
+          # Compile the APK
           if [ -f "gradlew" ]; then
             chmod +x gradlew
             ./gradlew assembleDebug --stacktrace
