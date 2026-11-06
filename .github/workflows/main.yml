@@ -1,0 +1,45 @@
+name: Build SpendIQ Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Compile APK
+        run: |
+          PROJECT_DIR="."
+          if [ -d "android" ] && [ -f "android/build.gradle.kts" ]; then
+            PROJECT_DIR="android"
+          fi
+          cd "$PROJECT_DIR"
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+            ./gradlew assembleDebug --stacktrace
+          else
+            gradle assembleDebug --stacktrace
+          fi
+
+      - name: Upload APK File
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpendIQ-debug-apk
+          path: |
+            **/app/build/outputs/apk/debug/*.apk
+            **/*.apk
+          retention-days: 14
